@@ -3,24 +3,30 @@ extern crate rand;
 use rand::distributions::{Distribution, Uniform};
 use rand::thread_rng;
 
-const TOTAL_ROLLS: i32 = 1_000_000;
+const TOTAL_RUNS: i32 = 1_000_000;
+const TOTAL_BLOG_POSTS: i32 = 60;
 
 fn main() {
     let mut rng = thread_rng();
-    let die = Uniform::from(1..7);
+    let time_to_completion = Uniform::from(2..11);
 
-    let mut sevens = 0;
-    for _ in 0..TOTAL_ROLLS {
-        let first_die = die.sample(&mut rng);
-        let second_die = die.sample(&mut rng);
-        if first_die + second_die == 7 {
-            sevens += 1
+    let mut successes = 0;
+
+    for _ in 0..TOTAL_RUNS {
+        let mut current_duration = 0;
+
+        for _ in 0..TOTAL_BLOG_POSTS {
+            current_duration += time_to_completion.sample(&mut rng);
+        }
+
+        if current_duration <= 365 {
+            successes += 1
         }
     }
 
-    let p: f64 = f64::from(sevens) / f64::from(TOTAL_ROLLS) * f64::from(100);
+    let p = f64::from(successes) / f64::from(TOTAL_RUNS) * f64::from(100);
 
-    println!("Total Rolls: {}", TOTAL_ROLLS);
-    println!("Total Sevens: {}", sevens);
-    println!("Probability of rolling a seven: {:.2}%", p);
+    println!("Total Simulations: {}", TOTAL_RUNS);
+    println!("Successes: {}", successes);
+    println!("Probability of succeeding: {:.2}%", p);
 }
