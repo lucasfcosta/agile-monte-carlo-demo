@@ -1,4 +1,4 @@
-# Agile Monte Carlo Simulations
+# Agile Monte Carlo Simulations Demos
 
 This is the repository which accompanies the blog post ["How to replace estimations and guesses with a Monte Carlo simulation"](https://lucasfcosta.com/2021/09/20/monte-carlo-forecasts.html).
 
@@ -20,3 +20,9 @@ I couldn't find a decent way to plot percentile lines into my histogram. I simpl
 In case you know how to do it, I'd appreciate it if you could open a PR showing me how.
 
 If you're able to solve this problem, in addition to me being eternally grateful, you'll have your name added to the original blog post, and I'll update it with the plot containing percentile lines. Furthermore, I'll pay for coffee next time you're in London.
+
+## Recommended Reading
+
+* [GUIMARÃES CARVALHO, Gabriel. The art of solving problems with Monte Carlo simulations](https://ggcarvalho.dev/posts/montecarlo/)
+* [VACANTI, Daniel. Actionable Agile Metrics For Predictability: An Introduction. ActionableAgile Press.](https://www.amazon.co.uk/dp/B013ZQ5TUQ)
+* [VACANTI, Daniel. When Will It Be Done?: Lean-Agile Forecasting to Answer Your Customers’ Most Important Question. ActionableAgile Press.](https://www.amazon.co.uk/When-Will-Done-Lean-Agile-Forecasting-ebook/dp/B084WVMKLC)
