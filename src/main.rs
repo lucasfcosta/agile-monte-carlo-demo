@@ -13,17 +13,17 @@ const TOTAL_RUNS: i32 = 1_000_000;
 const STORIES_TARGET: i32 = 50;
 const TEN_DAY_THROUGHPUTS: [i32; 10] = [1, 2, 0, 1, 1, 2, 3, 1, 2, 1];
 
-fn create_histogram(data: HashMap<i64, i32>) {
+fn create_histogram(data: &HashMap<i64, i32>) {
     let root_area = BitMapBackend::new("histogram.png", (600, 400)).into_drawing_area();
 
     root_area.fill(&WHITE).unwrap();
 
     let max_freq: i32 = *data.values().max().unwrap();
 
-    let min_timestamp = *data.keys().min().unwrap();
-    let max_timestamp = *data.keys().max().unwrap();
-    let min_date: DateTime<Local> = Local.timestamp(min_timestamp, 0);
-    let max_date: DateTime<Local> = Local.timestamp(max_timestamp, 0);
+    let min_timestamp = data.keys().min().unwrap();
+    let max_timestamp = data.keys().max().unwrap();
+    let min_date: DateTime<Local> = Local.timestamp(*min_timestamp, 0);
+    let max_date: DateTime<Local> = Local.timestamp(*max_timestamp, 0);
 
     let labels = data
         .keys()
@@ -48,13 +48,12 @@ fn create_histogram(data: HashMap<i64, i32>) {
         |l: &DateTime<Local>| l.format("                    %Y/%m/%d").to_string();
 
     ctx.configure_mesh()
-        .x_labels(10)
         .x_label_formatter(&label_formatter)
         .x_label_style(style)
         .draw()
         .unwrap();
 
-    let bars = data.into_iter().map(|(k, freq)| {
+    let bars = data.clone().into_iter().map(|(k, freq)| {
         let mut bar = Rectangle::new(
             [(Local.timestamp(k, 0), 0), (Local.timestamp(k, 0), freq)],
             BLUE.filled(),
@@ -62,8 +61,39 @@ fn create_histogram(data: HashMap<i64, i32>) {
         bar.set_margin(0, 0, 6, 6);
         bar
     });
-
     ctx.draw_series(bars).unwrap();
+}
+
+fn calculate_percentile(data: &HashMap<i64, i32>, percentile: i32) {
+    let total_sims: i32 = data.values().sum();
+
+    let p_qtd: i32 = total_sims - (total_sims as f64 / (100_f64 / percentile as f64)).ceil() as i32;
+
+    let mut hash_vec: Vec<(&i64, &i32)> = data.iter().collect();
+    hash_vec.sort_by(|a, b| b.0.cmp(a.0));
+
+    let mut sum = 0;
+    let mut percentile_timestamp: i64 = 0;
+
+    for (timestamp, freq) in hash_vec {
+        sum += freq;
+
+        if sum >= p_qtd {
+            percentile_timestamp = *timestamp;
+            break;
+        }
+    }
+
+    println!(
+        "Percentile {}: {} ({}/{})",
+        percentile,
+        Local
+            .timestamp(percentile_timestamp, 0)
+            .format("%Y/%m/%d")
+            .to_string(),
+        sum,
+        total_sims
+    );
 }
 
 fn main() {
@@ -91,5 +121,10 @@ fn main() {
     }
 
     println!("Total Simulations: {}", TOTAL_RUNS);
-    create_histogram(outcomes);
+    calculate_percentile(&outcomes, 25);
+    calculate_percentile(&outcomes, 50);
+    calculate_percentile(&outcomes, 75);
+    calculate_percentile(&outcomes, 85);
+    calculate_percentile(&outcomes, 95);
+    create_histogram(&outcomes);
 }
